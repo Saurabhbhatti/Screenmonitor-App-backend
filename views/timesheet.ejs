@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Sheet</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-size: 24px;
+        }
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        .info-section {
+            width: 48%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .info-section h2 {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            font-size: 16px;
+        }
+        .info-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .timesheet-info {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        .month-header {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            table-layout: fixed;
+            page-break-inside: auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+        th {
+            font-weight: bold;
+        }
+        .date-column {
+            width: 20%;
+        }
+        .day-column {
+            width: 10%;
+        }
+        .task-column {
+            width: 45%;
+        }
+        .hours-column {
+            width: 15%;
+        }
+        .leave-column {
+            width: 10%;
+        }
+        .task-description {
+            margin: 0;
+            padding: 0;
+        }
+        .no-data {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Timesheet</h1>
+        
+        <div class="info-container">
+            <div class="info-section">
+                <h2>Employee Details</h2>
+                <p><strong>Name:</strong> <%= user.firstName %> <%= user.lastName %></p>
+                <p><strong>Designation:</strong> <%= user.designation %></p>
+                <p><strong>Emp_Code:</strong> <%= user.empCode %></p>
+                <p><strong>Email:</strong> <%= user.email %></p>
+            </div>
+            
+            <div class="info-section timesheet-info">
+                <h2>Timesheet Details</h2>
+                <% 
+                  const firstEntryDate = new Date(data[0]?.date);
+                  const monthName = firstEntryDate.toLocaleDateString('en-US', { month: 'long' });
+                  const year = firstEntryDate.getFullYear();
+                %>
+                <div class="month-header">
+                    <p><strong>Month:</strong> <%= monthName %> <%= year %></p>
+                    <p><strong>Total Hours:</strong> <%= totalHoursSum.toFixed(2) %> hours</p>
+                    <p><strong>Total Days:</strong> <%= totalDays %> days</p>
+                </div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="date-column">Date</th>
+                    <th class="day-column">Day</th>
+                    <th class="task-column">DSR (Task)</th>
+                    <th class="hours-column">Total Hours</th>
+                    <th class="leave-column">Leave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (data.length === 0) { %>
+                    <tr>
+                        <td colspan="5" class="no-data">No data available</td>
+                    </tr>
+                <% } else { %>
+                    <% data.forEach(function(entry) { 
+                        const formattedDate = new Date(entry.date).toLocaleDateString('en-GB');
+                    %>
+                        <tr>
+                            <td class="date-column"><%= formattedDate %></td>
+                            <td class="day-column"><%= entry.day.substring(0, 3) %></td>
+                            <td class="task-column">
+                                <div class="task-description">
+                                    <%- entry.dsrTask %>
+                                </div>
+                            </td>
+                            <td class="hours-column"><%= entry.totalHours %></td>
+                            <td class="leave-column"><%= entry.leave %></td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
